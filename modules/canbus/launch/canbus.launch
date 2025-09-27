@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>canbus</name>
+        <dag_conf>modules/canbus/dag/canbus.dag</dag_conf>
+        <process_name>canbus</process_name>
+    </module>
+</cyber>

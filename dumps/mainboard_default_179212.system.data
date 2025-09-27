@@ -1,0 +1,38 @@
+mainboard_kernel_version : "Linux in-dev-docker 5.15.0-67-generic #74~20.04.1-Ubuntu SMP Wed Feb 22 14:52:34 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+"
+mainboard_process_cmdline : "mainboard
+-d
+modules/studio_connector/studio_connector.dag
+-p
+mainboard_default_179212
+-s
+CYBER_DEFAULT
+--disable_plugin_autoload
+"
+mainboard_process_context_switches_involuntary_second : 7
+mainboard_process_context_switches_voluntary_second : 2525
+mainboard_process_cpu_usage : 0.056
+mainboard_process_cpu_usage_system : 0.037
+mainboard_process_cpu_usage_user : 0.019
+mainboard_process_disk_read_bytes_second : 119963
+mainboard_process_disk_write_bytes_second : 1638
+mainboard_process_faults_major : 246
+mainboard_process_faults_minor_second : 1
+mainboard_process_fd_count : 19
+mainboard_process_inblocks_second : 234
+mainboard_process_io_read_bytes_second : 582
+mainboard_process_io_read_second : 5
+mainboard_process_io_write_bytes_second : 541
+mainboard_process_io_write_second : 0
+mainboard_process_memory_data_and_stack : 455880704
+mainboard_process_memory_resident : 418078720
+mainboard_process_memory_shared : 174186496
+mainboard_process_memory_text : 331776
+mainboard_process_memory_virtual : 897957888
+mainboard_process_nice : 0
+mainboard_process_outblocks_second : 3
+mainboard_process_priority : 20
+mainboard_process_thread_count : 22
+mainboard_process_uptime : 1650.605927
+mainboard_process_username : "unknown (No such device or address)"
+mainboard_process_work_dir : "/apollo"

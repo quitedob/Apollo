@@ -1,0 +1,39 @@
+mainboard_external_command_process_apollo_external_command_action_srv_response : 0
+mainboard_external_command_process_apollo_external_command_command_status_srv_response : 0
+mainboard_external_command_process_apollo_external_command_lane_follow_srv_response : 0
+mainboard_external_command_process_apollo_external_command_valet_parking_srv_response : 0
+mainboard_kernel_version : "Linux in-dev-docker 5.15.0-67-generic #74~20.04.1-Ubuntu SMP Wed Feb 22 14:52:34 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+"
+mainboard_process_cmdline : "mainboard
+-d
+modules/planning/planning_component/dag/planning.dag
+-d
+modules/external_command/process_component/dag/external_command_process.dag
+"
+mainboard_process_context_switches_involuntary_second : 1328
+mainboard_process_context_switches_voluntary_second : 2784
+mainboard_process_cpu_usage : 0.621
+mainboard_process_cpu_usage_system : 0.051
+mainboard_process_cpu_usage_user : 0.570
+mainboard_process_disk_read_bytes_second : 0
+mainboard_process_disk_write_bytes_second : 705500
+mainboard_process_faults_major : 801
+mainboard_process_faults_minor_second : 214
+mainboard_process_fd_count : 147
+mainboard_process_inblocks_second : 0
+mainboard_process_io_read_bytes_second : 592
+mainboard_process_io_read_second : 5
+mainboard_process_io_write_bytes_second : 705027
+mainboard_process_io_write_second : 398
+mainboard_process_memory_data_and_stack : 1550848000
+mainboard_process_memory_resident : 732565504
+mainboard_process_memory_shared : 288903168
+mainboard_process_memory_text : 331776
+mainboard_process_memory_virtual : 4570312704
+mainboard_process_nice : 0
+mainboard_process_outblocks_second : 1378
+mainboard_process_priority : 20
+mainboard_process_thread_count : 51
+mainboard_process_uptime : 1630.733518
+mainboard_process_username : "unknown (No such device or address)"
+mainboard_process_work_dir : "/apollo"
