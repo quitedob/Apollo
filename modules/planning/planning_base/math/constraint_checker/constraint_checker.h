@@ -36,9 +36,16 @@ class ConstraintChecker {
     LAT_ACCELERATION_OUT_OF_BOUND,
     LAT_JERK_OUT_OF_BOUND,
     CURVATURE_OUT_OF_BOUND,
+    // 竞赛规则特定的违规类型
+    STOP_DISTANCE_VIOLATION,
+    SIDE_PASS_LATERAL_VIOLATION,
+    SIDE_PASS_SPEED_VIOLATION,
+    SPEED_VIOLATION,
+    ACCELERATION_VIOLATION,
   };
   ConstraintChecker() = delete;
   static Result ValidTrajectory(const DiscretizedTrajectory& trajectory);
+  static bool IsSidePassScenario(const DiscretizedTrajectory& trajectory);
 };
 
 }  // namespace planning

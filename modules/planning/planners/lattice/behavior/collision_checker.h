@@ -43,10 +43,14 @@ class CollisionChecker {
 
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
-  static bool InCollision(const std::vector<const Obstacle*>& obstacles,
+  static   bool InCollision(const std::vector<const Obstacle*>& obstacles,
                           const DiscretizedTrajectory& ego_trajectory,
                           const double ego_length, const double ego_width,
                           const double ego_edge_to_center);
+
+  // Construction zone detection helpers
+  bool IsTrajectoryEnteringConstructionZone(const DiscretizedTrajectory& discretized_trajectory);
+  bool IsPointInConstructionZone(double x, double y, double relative_time);
 
  private:
   void BuildPredictedEnvironment(
@@ -65,6 +69,8 @@ class CollisionChecker {
   const ReferenceLineInfo* ptr_reference_line_info_;
   std::shared_ptr<PathTimeGraph> ptr_path_time_graph_;
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
+  // Construction zone tracking: mask indicating which obstacles are construction zones
+  std::vector<std::vector<bool>> predicted_is_construction_mask_;
 };
 
 }  // namespace planning

@@ -37,6 +37,10 @@ class StageParking : public Stage {
  private:
   StageResult FinishStage();
 
+  // Competition parking checks
+  bool CheckParkingLineViolation(Frame* frame, const std::string& parking_spot_id);
+  bool IsPointInNoParkingRegion(const apollo::common::PointENU& point);
+
   ScenarioValetParkingConfig scenario_config_;
 };
 

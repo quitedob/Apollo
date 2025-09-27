@@ -38,6 +38,9 @@ struct ValetParkingContext : public ScenarioContext {
   std::string target_parking_spot_id;
   bool pre_stop_rightaway_flag = false;
   hdmap::MapPathPoint pre_stop_rightaway_point;
+  // Competition parking timing
+  double parking_start_time = 0.0;  // Timestamp when parking scenario started
+  bool parking_line_violation = false;  // Whether parking line violation occurred
 };
 
 class ValetParkingScenario : public Scenario {
@@ -52,6 +55,17 @@ class ValetParkingScenario : public Scenario {
 
   bool IsTransferable(const Scenario* const other_scenario,
                       const Frame& frame) override;
+
+  // Competition parking spot selection
+  bool SelectNearestParkingSpotNearEntrance(const std::string& entrance_id,
+                                           double search_radius_m,
+                                           std::string* out_parking_spot_id);
+
+  // Helper functions for parking competition
+  bool GetEntrancePointById(const std::string& entrance_id,
+                           apollo::common::PointENU* entrance_point);
+  bool IsParkingSpotOccupied(const std::string& spot_id);
+  bool IsPointInNoParkingRegion(const apollo::common::PointENU& point);
 
  private:
   static bool SearchTargetParkingSpotOnPath(

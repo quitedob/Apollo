@@ -1,4 +1,4 @@
-mainboard_kernel_version : "Linux in-dev-docker 5.15.0-67-generic #74~20.04.1-Ubuntu SMP Wed Feb 22 14:52:34 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+mainboard_kernel_version : "Linux in-dev-docker 5.15.0-139-generic #149~20.04.1-Ubuntu SMP Wed Apr 16 08:29:56 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
 "
 mainboard_process_cmdline : "mainboard
 -d
@@ -8,30 +8,30 @@ monitor
 -s
 CYBER_DEFAULT
 "
-mainboard_process_context_switches_involuntary_second : 19
-mainboard_process_context_switches_voluntary_second : 2425
-mainboard_process_cpu_usage : 0.046
-mainboard_process_cpu_usage_system : 0.028
-mainboard_process_cpu_usage_user : 0.018
+mainboard_process_context_switches_involuntary_second : 2
+mainboard_process_context_switches_voluntary_second : 2897
+mainboard_process_cpu_usage : 0.147
+mainboard_process_cpu_usage_system : 0.102
+mainboard_process_cpu_usage_user : 0.045
 mainboard_process_disk_read_bytes_second : 0
-mainboard_process_disk_write_bytes_second : 4502
-mainboard_process_faults_major : 0
-mainboard_process_faults_minor_second : 1
+mainboard_process_disk_write_bytes_second : 2047
+mainboard_process_faults_major : 1795
+mainboard_process_faults_minor_second : 0
 mainboard_process_fd_count : 111
 mainboard_process_inblocks_second : 0
-mainboard_process_io_read_bytes_second : 21017
-mainboard_process_io_read_second : 300
-mainboard_process_io_write_bytes_second : 3475
-mainboard_process_io_write_second : 36
-mainboard_process_memory_data_and_stack : 548278272
-mainboard_process_memory_resident : 344629248
-mainboard_process_memory_shared : 100966400
+mainboard_process_io_read_bytes_second : 10302
+mainboard_process_io_read_second : 298
+mainboard_process_io_write_bytes_second : 851
+mainboard_process_io_write_second : 1
+mainboard_process_memory_data_and_stack : 540942336
+mainboard_process_memory_resident : 336011264
+mainboard_process_memory_shared : 98050048
 mainboard_process_memory_text : 331776
-mainboard_process_memory_virtual : 862334976
+mainboard_process_memory_virtual : 834011136
 mainboard_process_nice : 0
-mainboard_process_outblocks_second : 9
+mainboard_process_outblocks_second : 4
 mainboard_process_priority : 20
 mainboard_process_thread_count : 35
-mainboard_process_uptime : 2280.659271
+mainboard_process_uptime : 5952.647953
 mainboard_process_username : "unknown (No such device or address)"
 mainboard_process_work_dir : "/apollo"

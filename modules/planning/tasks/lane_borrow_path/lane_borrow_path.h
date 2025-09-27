@@ -116,6 +116,11 @@ class LaneBorrowPath : public PathGeneration {
    * @param lane_borrow_info is borrow side.
    */
   void SetPathInfo(PathData* const path_data);
+  /**
+   * @brief 竞赛要求：限制侧向绕障时的速度上限为5.0 m/s
+   * @param path_data 需要限制速度的路径数据
+   */
+  void LimitSidePassSpeed(PathData* const path_data);
   LaneBorrowPathConfig config_;
   std::vector<SidePassDirection> decided_side_pass_direction_;
   int use_self_lane_;

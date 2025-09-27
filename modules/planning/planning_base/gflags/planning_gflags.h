@@ -306,3 +306,23 @@ DECLARE_bool(enable_control_interactive_replan);
 
 DECLARE_int32(close_range_obstacle_nudge_range_remain_farmes);
 DECLARE_double(close_range_obstacle_nudge_pedestrian_waiting_time);
+
+// Competition-specific flags
+DECLARE_double(max_driving_speed);              // Maximum driving speed (m/s), competition limit 16.67
+DECLARE_double(max_long_acc);                   // Maximum longitudinal acceleration (m/s^2), competition limit 3.0
+DECLARE_double(max_long_dec);                   // Maximum longitudinal deceleration (positive value, m/s^2), competition limit 6.0
+DECLARE_double(max_lateral_acc);                // Maximum lateral (centripetal) acceleration (m/s^2), competition limit 2.0
+DECLARE_double(stop_tolerance_min);             // Minimum tolerance distance from stop to stop line (m), competition 2.0
+DECLARE_double(stop_tolerance_max);             // Maximum tolerance distance from stop to stop line (m), competition 2.5
+DECLARE_int32(scenario_time_limit_sec);         // Scenario time limit (seconds), competition 90
+
+// Construction zone flags
+DECLARE_double(construction_area_speed_limit);        // Construction area speed limit (m/s), 30 km/h
+DECLARE_string(construction_obstacle_id_prefix);      // Construction zone virtual obstacle ID prefix
+DECLARE_double(construction_penalty_per_frame_per_mps); // Penalty per frame per m/s overspeed in construction zone
+
+// Autonomous parking flags
+DECLARE_double(parking_search_radius_m);              // Parking search radius from entrance (m)
+DECLARE_int32(parking_search_timeout_sec);            // Parking search timeout (seconds), competition 90
+DECLARE_double(parking_line_tolerance_m);             // Parking line violation tolerance (m), deduct 20 points if exceeded
+DECLARE_string(parking_entrance_id);                  // Parking entrance ID for nearest spot search

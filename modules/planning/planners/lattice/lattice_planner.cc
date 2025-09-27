@@ -173,6 +173,8 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   double speed_limit =
       reference_line_info->reference_line().GetSpeedLimitFromS(init_s[0]);
+  // 竞赛要求：强制将 cruise speed 限制为比赛规则允许的最大速度
+  speed_limit = std::min(speed_limit, FLAGS_max_driving_speed);
   reference_line_info->SetLatticeCruiseSpeed(speed_limit);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
@@ -180,6 +182,9 @@ Status LatticePlanner::PlanOnReferenceLine(
     ADEBUG << "Planning target stop s: " << planning_target.stop_point().s()
            << "Current ego s: " << init_s[0];
   }
+
+  // 竞赛要求：场景超时判断（90秒）
+  double plan_start_time = start_time;  // 使用函数开始时间作为规划开始时间
 
   ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
@@ -282,6 +287,55 @@ Status LatticePlanner::PlanOnReferenceLine(
       continue;
     }
 
+    // 竞赛要求：施工区进入检查
+    if (collision_checker.IsTrajectoryEnteringConstructionZone(combined_trajectory)) {
+      AERROR << "[COMPETITION_VIOLATION] CONSTRUCTION_ZONE_ENTRY: "
+             << "Reject trajectory: would enter construction zone. "
+             << "Competition rule: entering construction zone results in 0 points";
+      continue;  // 尝试下一个轨迹
+    }
+
+    // 竞赛要求：施工区速度限制检查
+    bool violate_construction_speed = false;
+    for (const auto& pt : combined_trajectory) {
+      // 检查该点是否在施工区内
+      if (collision_checker.IsPointInConstructionZone(
+          pt.path_point().x(), pt.path_point().y(), pt.relative_time())) {
+        if (pt.v() > FLAGS_construction_area_speed_limit + 1e-6) {
+          violate_construction_speed = true;
+          AERROR << "[COMPETITION_VIOLATION] CONSTRUCTION_SPEED_VIOLATION: "
+                 << "Speed " << pt.v() << " m/s exceeds construction zone limit "
+                 << FLAGS_construction_area_speed_limit << " m/s at time "
+                 << pt.relative_time() << "s";
+          break;
+        }
+      }
+    }
+    if (violate_construction_speed) {
+      ADEBUG << "Reject trajectory: construction-zone speed limit violated.";
+      continue;
+    }
+
+    // 竞赛要求：停车容差检查（必须在2.0-2.5m范围内）
+    if (planning_target.has_stop_point()) {
+      double stop_s = planning_target.stop_point().s();  // 停止线位置 s
+      // 取 combined_trajectory 最后一个轨迹点 s（假设最后点是停车点）
+      const auto& last_point = combined_trajectory.back();
+      double ego_stop_s = last_point.path_point().s();
+
+      double stop_dist = std::fabs(stop_s - ego_stop_s);
+      if (stop_dist < FLAGS_stop_tolerance_min - 1e-6 ||
+          stop_dist > FLAGS_stop_tolerance_max + 1e-6) {
+        // 不满足停车容差：尝试下一个轨迹（continue）
+        AERROR << "[COMPETITION_VIOLATION] STOP_DISTANCE_VIOLATION: "
+               << "Reject trajectory: stop distance " << stop_dist
+               << " not in [" << FLAGS_stop_tolerance_min << ","
+               << FLAGS_stop_tolerance_max << "] m. "
+               << "Competition rule: stop distance must be 2.0-2.5m before stop line";
+        continue;
+      }
+    }
+
     // put combine trajectory into debug data
     const auto& combined_trajectory_points = combined_trajectory;
     num_lattice_traj += 1;
@@ -316,6 +370,14 @@ Status LatticePlanner::PlanOnReferenceLine(
     ADEBUG << "Reference_line_priority_cost = "
            << reference_line_info->PriorityCost();
     ADEBUG << "Total_Trajectory_Cost = " << trajectory_pair_cost;
+    // 竞赛要求：场景超时判断
+    if (Clock::NowInSeconds() - plan_start_time > FLAGS_scenario_time_limit_sec) {
+      AERROR << "[COMPETITION_VIOLATION] SCENARIO_TIMEOUT: "
+             << "Planning exceeded scenario time limit (" << FLAGS_scenario_time_limit_sec << "s). "
+             << "Competition rule: scenario must complete within 90 seconds";
+      return Status(ErrorCode::PLANNING_ERROR, "Scenario time limit exceeded");
+    }
+
     ADEBUG << "OutputTrajectory";
     for (uint i = 0; i < 10; ++i) {
       ADEBUG << combined_trajectory_points[i].ShortDebugString();

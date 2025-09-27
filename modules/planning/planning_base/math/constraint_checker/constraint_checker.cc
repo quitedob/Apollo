@@ -36,28 +36,73 @@ bool WithinRange(const T v, const T lower, const T upper) {
 ConstraintChecker::Result ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
   const double kMaxCheckRelativeTime = FLAGS_trajectory_time_length;
+  // 竞赛要求：侧向绕障时速度上限为5.0 m/s
+  const double kMaxSidePassSpeed = 5.0;  // m/s
+
   for (const auto& p : trajectory) {
     double t = p.relative_time();
     if (t > kMaxCheckRelativeTime) {
       break;
     }
     double lon_v = p.v();
-    if (!WithinRange(lon_v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
-      ADEBUG << "Velocity at relative time " << t
-             << " exceeds bound, value: " << lon_v << ", bound ["
-             << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
-             << "].";
-      return Result::LON_VELOCITY_OUT_OF_BOUND;
+
+    // 检查是否处于侧向绕障场景（根据规划上下文或其他标志判断）
+    // 这里暂时使用简单的速度阈值检测，如果轨迹中存在低速行驶且有横向偏移的情况
+    bool is_side_pass_scenario = IsSidePassScenario(trajectory);
+
+    // 如果处于侧向绕障场景，应用更严格的速度限制
+    double max_allowed_speed = is_side_pass_scenario ? kMaxSidePassSpeed : FLAGS_max_driving_speed;
+
+    if (!WithinRange(lon_v, FLAGS_speed_lower_bound, max_allowed_speed)) {
+      if (is_side_pass_scenario) {
+        // 竞赛违规：侧向绕障速度超限
+        AERROR << "[COMPETITION_VIOLATION] SIDE_PASS_SPEED_VIOLATION: "
+               << "Side pass velocity at relative time " << t
+               << " exceeds bound, value: " << lon_v << " m/s, bound ["
+               << FLAGS_speed_lower_bound << ", " << kMaxSidePassSpeed
+               << "]. Competition rule: side-pass speed <= 5.0 m/s";
+        return Result::SIDE_PASS_SPEED_VIOLATION;
+      } else {
+        // 竞赛违规：速度超限（60 km/h = 16.67 m/s）
+        if (lon_v > FLAGS_planning_upper_speed_limit) {
+          AERROR << "[COMPETITION_VIOLATION] SPEED_VIOLATION: "
+                 << "Velocity at relative time " << t
+                 << " exceeds bound, value: " << lon_v << " m/s, bound ["
+                 << FLAGS_speed_lower_bound << ", " << FLAGS_planning_upper_speed_limit
+                 << "]. Competition rule: max speed <= 16.67 m/s (60 km/h)";
+          return Result::SPEED_VIOLATION;
+        } else {
+          ADEBUG << "Velocity at relative time " << t
+                 << " exceeds bound, value: " << lon_v << ", bound ["
+                 << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
+                 << "].";
+        }
+        return Result::LON_VELOCITY_OUT_OF_BOUND;
+      }
     }
 
     double lon_a = p.a();
-    if (!WithinRange(lon_a, FLAGS_longitudinal_acceleration_lower_bound,
-                     FLAGS_longitudinal_acceleration_upper_bound)) {
-      ADEBUG << "Longitudinal acceleration at relative time " << t
-             << " exceeds bound, value: " << lon_a << ", bound ["
-             << FLAGS_longitudinal_acceleration_lower_bound << ", "
-             << FLAGS_longitudinal_acceleration_upper_bound << "].";
-      return Result::LON_ACCELERATION_OUT_OF_BOUND;
+    // 使用竞赛专用加速度限制
+    if (!WithinRange(lon_a, -FLAGS_max_long_dec, FLAGS_max_long_acc)) {
+      // 竞赛违规：加速度超限
+      if (lon_a > FLAGS_max_long_acc) {
+        AERROR << "[COMPETITION_VIOLATION] MAX_LONGITUDINAL_ACCELERATION: "
+               << "Longitudinal acceleration at relative time " << t
+               << " exceeds upper bound, value: " << lon_a << " m/s², bound ["
+               << -FLAGS_max_long_dec << ", " << FLAGS_max_long_acc
+               << "]. Competition rule: acceleration <= " << FLAGS_max_long_acc << " m/s²";
+      } else if (lon_a < -FLAGS_max_long_dec) {
+        AERROR << "[COMPETITION_VIOLATION] MIN_LONGITUDINAL_ACCELERATION: "
+               << "Longitudinal deceleration at relative time " << t
+               << " exceeds lower bound, value: " << lon_a << " m/s², bound ["
+               << -FLAGS_max_long_dec << ", " << FLAGS_max_long_acc
+               << "]. Competition rule: deceleration >= -" << FLAGS_max_long_dec << " m/s²";
+      } else {
+        ADEBUG << "Longitudinal acceleration at relative time " << t
+               << " exceeds bound, value: " << lon_a << ", bound ["
+               << -FLAGS_max_long_dec << ", " << FLAGS_max_long_acc << "].";
+      }
+      return Result::ACCELERATION_VIOLATION;
     }
 
     double kappa = p.path_point().kappa();
@@ -92,12 +137,14 @@ ConstraintChecker::Result ConstraintChecker::ValidTrajectory(
     }
 
     double lat_a = p1.v() * p1.v() * p1.path_point().kappa();
-    if (!WithinRange(lat_a, -FLAGS_lateral_acceleration_bound,
-                     FLAGS_lateral_acceleration_bound)) {
-      ADEBUG << "Lateral acceleration at relative time " << t
-             << " exceeds bound, value: " << lat_a << ", bound ["
-             << -FLAGS_lateral_acceleration_bound << ", "
-             << FLAGS_lateral_acceleration_bound << "].";
+    // 使用竞赛专用横向加速度限制
+    if (!WithinRange(lat_a, -FLAGS_max_lateral_acc, FLAGS_max_lateral_acc)) {
+      // 竞赛违规：向心加速度超限
+      AERROR << "[COMPETITION_VIOLATION] MAX_LATERAL_ACCELERATION: "
+             << "Lateral acceleration at relative time " << t
+             << " exceeds bound, value: " << lat_a << " m/s², bound ["
+             << -FLAGS_max_lateral_acc << ", " << FLAGS_max_lateral_acc
+             << "]. Competition rule: centripetal acceleration <= " << FLAGS_max_lateral_acc << " m/s²";
       return Result::LAT_ACCELERATION_OUT_OF_BOUND;
     }
 
@@ -119,6 +166,45 @@ ConstraintChecker::Result ConstraintChecker::ValidTrajectory(
   }
 
   return Result::VALID;
+}
+
+bool ConstraintChecker::IsSidePassScenario(const DiscretizedTrajectory& trajectory) {
+  // 简单检测侧向绕障场景的逻辑：
+  // 1. 检查轨迹中是否存在明显的横向偏移
+  // 2. 检查是否在低速行驶（可能是为了绕障而减速）
+
+  if (trajectory.NumOfPoints() < 2) {
+    return false;
+  }
+
+  // 计算轨迹的平均横向偏移
+  double total_lateral_offset = 0.0;
+  double max_lateral_offset = 0.0;
+  double avg_speed = 0.0;
+
+  for (const auto& point : trajectory) {
+    double lateral_offset = std::abs(point.path_point().d());  // 使用d()作为横向偏移
+    total_lateral_offset += lateral_offset;
+    max_lateral_offset = std::max(max_lateral_offset, lateral_offset);
+    avg_speed += point.v();
+  }
+
+  double avg_lateral_offset = total_lateral_offset / trajectory.NumOfPoints();
+  avg_speed /= trajectory.NumOfPoints();
+
+  // 侧向绕障的判定条件：
+  // 1. 平均横向偏移大于阈值（表示有明显的侧向移动）
+  // 2. 最大横向偏移大于阈值
+  // 3. 平均速度相对较低（绕障时通常会减速）
+  const double kMinAvgLateralOffset = 0.5;  // 米
+  const double kMinMaxLateralOffset = 1.0;  // 米
+  const double kMaxAvgSpeedForSidePass = 8.0;  // m/s
+
+  bool has_lateral_movement = avg_lateral_offset > kMinAvgLateralOffset ||
+                             max_lateral_offset > kMinMaxLateralOffset;
+  bool is_low_speed = avg_speed < kMaxAvgSpeedForSidePass;
+
+  return has_lateral_movement && is_low_speed;
 }
 
 }  // namespace planning

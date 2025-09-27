@@ -9,30 +9,30 @@ mainboard_default_214897
 CYBER_DEFAULT
 --disable_plugin_autoload
 "
-mainboard_process_context_switches_involuntary_second : 5
-mainboard_process_context_switches_voluntary_second : 1917
-mainboard_process_cpu_usage : 0.025
-mainboard_process_cpu_usage_system : 0.019
-mainboard_process_cpu_usage_user : 0.007
+mainboard_process_context_switches_involuntary_second : 3
+mainboard_process_context_switches_voluntary_second : 2368
+mainboard_process_cpu_usage : 0.049
+mainboard_process_cpu_usage_system : 0.038
+mainboard_process_cpu_usage_user : 0.011
 mainboard_process_disk_read_bytes_second : 0
-mainboard_process_disk_write_bytes_second : 1227
-mainboard_process_faults_major : 34
+mainboard_process_disk_write_bytes_second : 1228
+mainboard_process_faults_major : 57
 mainboard_process_faults_minor_second : 0
 mainboard_process_fd_count : 116
 mainboard_process_inblocks_second : 0
-mainboard_process_io_read_bytes_second : 540
+mainboard_process_io_read_bytes_second : 586
 mainboard_process_io_read_second : 5
 mainboard_process_io_write_bytes_second : 535
 mainboard_process_io_write_second : 0
-mainboard_process_memory_data_and_stack : 593248256
-mainboard_process_memory_resident : 422416384
-mainboard_process_memory_shared : 175497216
+mainboard_process_memory_data_and_stack : 594296832
+mainboard_process_memory_resident : 319520768
+mainboard_process_memory_shared : 71512064
 mainboard_process_memory_text : 331776
-mainboard_process_memory_virtual : 1035390976
+mainboard_process_memory_virtual : 1036439552
 mainboard_process_nice : 0
 mainboard_process_outblocks_second : 2
 mainboard_process_priority : 20
 mainboard_process_thread_count : 38
-mainboard_process_uptime : 2280.599630
+mainboard_process_uptime : 10414.894808
 mainboard_process_username : "unknown (No such device or address)"
 mainboard_process_work_dir : "/apollo"

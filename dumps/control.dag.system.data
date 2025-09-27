@@ -4,30 +4,30 @@ mainboard_process_cmdline : "mainboard
 -d
 modules/control/control_component/dag/control.dag
 "
-mainboard_process_context_switches_involuntary_second : 86
-mainboard_process_context_switches_voluntary_second : 4060
-mainboard_process_cpu_usage : 0.148
-mainboard_process_cpu_usage_system : 0.042
-mainboard_process_cpu_usage_user : 0.106
+mainboard_process_context_switches_involuntary_second : 436
+mainboard_process_context_switches_voluntary_second : 3654
+mainboard_process_cpu_usage : 0.118
+mainboard_process_cpu_usage_system : 0.055
+mainboard_process_cpu_usage_user : 0.063
 mainboard_process_disk_read_bytes_second : 0
-mainboard_process_disk_write_bytes_second : 5729
+mainboard_process_disk_write_bytes_second : 38850
 mainboard_process_faults_major : 521
-mainboard_process_faults_minor_second : 0
-mainboard_process_fd_count : 145
+mainboard_process_faults_minor_second : 5952
+mainboard_process_fd_count : 47
 mainboard_process_inblocks_second : 0
-mainboard_process_io_read_bytes_second : 581
-mainboard_process_io_read_second : 5
-mainboard_process_io_write_bytes_second : 5176
-mainboard_process_io_write_second : 58
-mainboard_process_memory_data_and_stack : 612265984
-mainboard_process_memory_resident : 353169408
-mainboard_process_memory_shared : 103165952
+mainboard_process_io_read_bytes_second : 29761
+mainboard_process_io_read_second : 62
+mainboard_process_io_write_bytes_second : 36635
+mainboard_process_io_write_second : 517
+mainboard_process_memory_data_and_stack : 431910912
+mainboard_process_memory_resident : 330498048
+mainboard_process_memory_shared : 89702400
 mainboard_process_memory_text : 331776
-mainboard_process_memory_virtual : 913203200
+mainboard_process_memory_virtual : 653352960
 mainboard_process_nice : 0
-mainboard_process_outblocks_second : 11
+mainboard_process_outblocks_second : 76
 mainboard_process_priority : 20
-mainboard_process_thread_count : 43
-mainboard_process_uptime : 1630.497244
+mainboard_process_thread_count : 19
+mainboard_process_uptime : 10.242551
 mainboard_process_username : "unknown (No such device or address)"
 mainboard_process_work_dir : "/apollo"

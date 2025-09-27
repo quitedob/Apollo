@@ -89,7 +89,7 @@ DEFINE_double(smoothed_reference_line_max_diff, 5.0,
               "Maximum position difference between the smoothed and the raw "
               "reference lines.");
 
-DEFINE_double(planning_upper_speed_limit, 31.3,
+DEFINE_double(planning_upper_speed_limit, 16.67,
               "Maximum speed (m/s) in planning.");
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
@@ -105,7 +105,7 @@ DEFINE_double(
     trajectory_time_high_density_period, 1.0,
     "(seconds) Keep high density in the next this amount of seconds. ");
 
-DEFINE_bool(enable_trajectory_check, false,
+DEFINE_bool(enable_trajectory_check, true,
             "Enable sanity check for planning trajectory.");
 
 DEFINE_double(speed_lower_bound, -0.1, "The lowest speed allowed.");
@@ -113,9 +113,9 @@ DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
 DEFINE_double(longitudinal_acceleration_lower_bound, -6.0,
               "The lowest longitudinal acceleration allowed.");
-DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
+DEFINE_double(longitudinal_acceleration_upper_bound, 3.0,
               "The highest longitudinal acceleration allowed.");
-DEFINE_double(lateral_acceleration_bound, 4.0,
+DEFINE_double(lateral_acceleration_bound, 2.0,
               "Bound of lateral acceleration; symmetric for left and right");
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
@@ -132,16 +132,16 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_double(static_obstacle_nudge_l_buffer, 0.3,
+DEFINE_double(static_obstacle_nudge_l_buffer, 1.0,
               "minimum l-distance to nudge a static obstacle (meters)");
-DEFINE_double(nonstatic_obstacle_nudge_l_buffer, 0.4,
+DEFINE_double(nonstatic_obstacle_nudge_l_buffer, 1.0,
               "minimum l-distance to nudge a non-static obstacle (meters)");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
-DEFINE_double(max_stop_distance_obstacle, 10.0,
+DEFINE_double(max_stop_distance_obstacle, 2.0,
               "max stop distance from in-lane obstacle (meters)");
-DEFINE_double(min_stop_distance_obstacle, 6.0,
+DEFINE_double(min_stop_distance_obstacle, 1.5,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
@@ -302,7 +302,7 @@ DEFINE_double(fallback_time_unit, 0.1,
 DEFINE_double(speed_bump_speed_limit, 4.4704,
               "the speed limit when passing a speed bump, m/s. The default "
               "speed limit is 10 mph.");
-DEFINE_double(default_city_road_speed_limit, 15.67,
+DEFINE_double(default_city_road_speed_limit, 16.67,
               "default speed limit (m/s) for city road. 35 mph.");
 DEFINE_double(default_highway_speed_limit, 29.06,
               "default speed limit (m/s) for highway. 65 mph.");
@@ -546,3 +546,23 @@ DEFINE_int32(close_range_obstacle_nudge_range_remain_farmes, 5,
              "remain the nudge range in frames");
 DEFINE_double(close_range_obstacle_nudge_pedestrian_waiting_time, 2.0,
               "waiting time for pedestrians");
+
+// Competition-specific flag definitions
+DEFINE_double(max_driving_speed, 16.67, "比赛最大允许速度(m/s)");
+DEFINE_double(max_long_acc, 3.0, "比赛最大纵向加速度(m/s^2)");
+DEFINE_double(max_long_dec, 6.0, "比赛最大纵向减速度(取正值, m/s^2)");
+DEFINE_double(max_lateral_acc, 2.0, "比赛最大横向加速度(m/s^2)");
+DEFINE_double(stop_tolerance_min, 2.0, "停车到停止线最小距离(m)");
+DEFINE_double(stop_tolerance_max, 2.5, "停车到停止线最大距离(m)");
+DEFINE_int32(scenario_time_limit_sec, 90, "场景限时(秒)");
+
+// Construction zone flag definitions
+DEFINE_double(construction_area_speed_limit, 8.333333, "施工区域限速(m/s), 默认 30 km/h");
+DEFINE_string(construction_obstacle_id_prefix, "CONSTRUCTION_", "施工区虚拟障碍物 ID 前缀");
+DEFINE_double(construction_penalty_per_frame_per_mps, 2.0, "施工区内每帧每超速1m/s 扣分");
+
+// Autonomous parking flag definitions
+DEFINE_double(parking_search_radius_m, 40.0, "停车场入口周围搜索停车位半径(m)");
+DEFINE_int32(parking_search_timeout_sec, 85, "自主泊车总超时时间(秒)，比赛要求90秒");
+DEFINE_double(parking_line_tolerance_m, 0.1, "停车压线容忍距离(m)，超出扣20分");
+DEFINE_string(parking_entrance_id, "", "停车场入口ID，用于最近停车位搜索");
