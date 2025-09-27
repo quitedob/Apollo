@@ -1,0 +1,62 @@
+# rule.txt - C/C++ 修改与提交 编译/链接/质量 规避规则（中/英简要）
+# 版本: 2025-09-27
+# 目的: 避免修改代码时引入常见的编译、链接、ABI、不安全引用与二进制膨胀问题
+
+# 1. 编译前基础检查（mandatory）
+1.1 运行全量构建：bazel build //... 或者 buildtool build（视项目而定）。若失败，不准提交。  # 检测缺失文件/依赖/BUILD错误
+1.2 运行项目单元/集成测试：bazel test //... 或等价命令。若新改动导致测试失败，标记为失败。
+1.3 检查编译器/标准一致性：使用仓库指定的 toolchain（gcc/clang & C++ standard），不随意改 CXXFLAGS（-std=c++17/20/23）。
+
+# 2. 头文件与引用（include/forward-declare）规则
+2.1 头文件只声明：尽量把实现放到 .cpp；头文件只包含必要的头（使用 forward declaration 减少耦合）。
+2.2 禁止把 heavy template/inline 实现在普通头中（如非必须请移到编译单元或 .tpp），避免模板导致虚增（binary bloat）。
+2.3 引用（&/const &）不能指向局部临时对象或即将销毁的临时值。提交时搜索 "return reference" 和 "bind temporary to non-const reference"。
+
+# 3. 链接与符号（linker）规则
+3.1 对出现 undefined reference 的改动，先定位哪一个目标（bazel target / BUILD）没有把实现或库链接上。不要在 PR 中添加裸的 .o；应修改 BUILD.bazel/BUILD 文件把目标依赖写清楚。  # 链接阶段错误通常是未把 .cc 或库加入 target。
+3.2 修改涉及 shared library (.so) 时，确保编译使用 -fPIC；打包时检查 ldd 确认依赖都能找到（LD_LIBRARY_PATH / rpath）。提交前运行 `ldd` / `readelf -d` 验证。 
+3.3 若新增符号冲突或 ODR（one-definition rule）问题，优先检查 inline/模板/静态变量重复定义；在头中用 inline constexpr 或 anonymous namespace 控制 linkage。
+
+# 4. ABI / toolchain / proto / protobuf 等兼容性
+4.1 不要在同一进程中混用不同编译器或不同 libstdc++ ABI（e.g. GCC 5 vs GCC 11 的 C++ ABI），若必须，要在 CI 中强制一致的 toolchain。
+4.2 修改或升级 protobuf/gRPC/gflags 等第三方时，先在 sandbox 环境做全量重编译并跑集成测试（proto 版本不匹配会导致运行时 crash 或 link 错误）。
+
+# 5. 资源/生命周期/悬挂引用（C++ 引用/指针安全）
+5.1 不要返回或保存对局部变量的引用/指针；对外部资源使用智能指针（std::shared_ptr / std::unique_ptr）或明确文档化所有权。
+5.2 对跨线程共享对象，明确使用锁或 std::atomic；不要把 non-thread-safe 对象按引用传出线程边界。
+5.3 避免裸指针作为长期所有者。对于 API 仍需裸指针时，在注释里写明生命期约束。
+
+# 6. 性能/体积（"虚增" / binary bloat）检测
+6.1 PR 必须包含二进制体积差异检查脚本（示例见下文），若二进制或库体积增长 > 2% 或增长超过 1 MB 则标红并 require author 说明原因。
+6.2 避免把大量实现直接写入头文件（模板/inline 导致重复实例化）；对大型 utility/模板放入单独 .tpp 并通过显式实例化减少虚增。
+6.3 使用 LTO 或 link-time pruning 时要在 CI 中评估与 baseline 差异。
+
+# 7. 编码风格/警告/静态分析
+7.1 默认开启 -Wall -Wextra -Werror（至少在 CI），任何新提交不得引入新的 warning。对历史 legacy code 可逐步清理。
+7.2 CI 强制运行 clang-tidy / cpplint / include-what-you-use，禁止引入明显的代码异味（memory leak, use-after-free, unchecked return）。
+7.3 建议运行 AddressSanitizer / UndefinedBehaviorSanitizer 在 nightly 或 PR 测试上发现隐藏 bug。
+
+# 8. Bazel / BUILD 文件修改规则（适用于 Apollo / 大型 monorepo）
+8.1 新增源文件后，必须修改对应 BUILD.bazel/BUILD，把 srcs/hdrs/deps 明确列出。不要 rely on implicit glob 导入会导致随机缺失。  # Bazel missing input 常见原因
+8.2 修改第三方依赖（http_archive / rules_*）要附带复现步骤与回滚方案，并在 CI 上做全量 rebuild 测试。
+8.3 若修改 plugin/so 注册宏（如 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN），请确认 plugin 名称、deps、copts 与 PATH 一致并测试运行时加载（日志/ldd 检查）。  # plugin 注册错误会导致 runtime 未加载
+
+# 9. 提交 / PR 流程（最低门坎）
+9.1 本地通过 `bazel build //...` + `bazel test //...`（或项目等价命令）才可提交。
+9.2 PR description 必须包含：改动概要、是否影响 ABI、是否增加第三方依赖、是否可能导致体积增长（是/否 + 明细）。
+9.3 Reviewer 要点：检查 BUILD 变动、是否有头文件实现泄露、是否存在返回引用临时变量、是否引入 new/w/o smart pointer。
+
+# 10. 快速诊断命令清单（PR 里建议附上执行结果）
+- 编译： `bazel build //...` 或 `buildtool build`
+- 测试： `bazel test //...`
+- 找 undefined ref： `nm -C libfoo.so | c++filt | grep 'symbol'`；linker 输出通常会指明缺符号
+- 检查 shared libs： `ldd mybinary | grep 'not found'`；`readelf -d mybinary`
+- 检查符号重复/ODR： `nm -C --defined-only libfoo.so | sort`
+- 二进制体积比对： `du -h build/out/libfoo.so` 或 `size`/`objdump -h` 比较
+- Bazel 清理： `bazel clean --expunge`（仅在遇到不可解释的 missing-input / cache 问题时）  # 可解决 bazel 缓存导致的奇怪错误
+
+# 附：若遇到难解的 Bazel missing input / SolibSymlink / missing shared library 问题
+- 先尝试 `bazel clean --expunge`，再全量 rebuild；若仍然失败，检查 WORKSPACE / http_archive 拉取失败日志并复现网络/镜像问题（并行恢复）。  # 常见 workaround
+- 若是 runtime 找不到 .so，则检查 rpath/LD_LIBRARY_PATH 或把依赖写入 BUILD 的 deps/ linkopts。
+
+# 注：以上规则按严重性排序（1 最重要），建议把此文件纳入仓库并在 CI 前做 pre-commit hook 强制执行部分检查。
