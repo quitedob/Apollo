@@ -9,4 +9,10 @@ message ScenarioValetParkingConfig {
   // Only when the distance between the vehicle and pre-stop distance is smaller
   // than this value, "StageApproachingParkingSpot" can be finished
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+  // Radius used for automatic parking spot selection when no spot id is given.
+  optional double parking_search_radius = 3 [default = 40.0];  // meter
+  // Timeout for valet parking completion.
+  optional double parking_search_timeout_sec = 4 [default = 90.0];  // second
+  // Allowed parking line overlap tolerance before counting violation.
+  optional double parking_line_tolerance = 5 [default = 0.1];  // meter
 }

@@ -311,7 +311,7 @@ DEFINE_double(default_highway_speed_limit, 29.06,
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
 
-// TODO(all): open space planner, merge with planning conf
+// Open-space planner configuration.
 DEFINE_string(planner_open_space_config_filename,
               "modules/planning/planning_component/conf/"
               "planner_open_space_config.pb.txt",
@@ -548,21 +548,40 @@ DEFINE_double(close_range_obstacle_nudge_pedestrian_waiting_time, 2.0,
               "waiting time for pedestrians");
 
 // Competition-specific flag definitions
-DEFINE_double(max_driving_speed, 16.67, "比赛最大允许速度(m/s)");
-DEFINE_double(max_long_acc, 3.0, "比赛最大纵向加速度(m/s^2)");
-DEFINE_double(max_long_dec, 6.0, "比赛最大纵向减速度(取正值, m/s^2)");
-DEFINE_double(max_lateral_acc, 2.0, "比赛最大横向加速度(m/s^2)");
-DEFINE_double(stop_tolerance_min, 2.0, "停车到停止线最小距离(m)");
-DEFINE_double(stop_tolerance_max, 2.5, "停车到停止线最大距离(m)");
-DEFINE_int32(scenario_time_limit_sec, 90, "场景限时(秒)");
+DEFINE_double(max_driving_speed, 16.67,
+              "Maximum allowed driving speed in competition (m/s)");
+DEFINE_double(max_long_acc, 3.0,
+              "Maximum longitudinal acceleration in competition (m/s^2)");
+DEFINE_double(max_long_dec, 6.0,
+              "Maximum longitudinal deceleration magnitude in competition "
+              "(m/s^2)");
+DEFINE_double(max_lateral_acc, 2.0,
+              "Maximum lateral acceleration in competition (m/s^2)");
+DEFINE_double(stop_tolerance_min, 2.0,
+              "Stop-sign minimum distance to stop line when stopping (m)");
+DEFINE_double(stop_tolerance_max, 2.5,
+              "Stop-sign maximum distance to stop line when stopping (m)");
+DEFINE_double(traffic_light_stop_distance_min, 1.5,
+              "Traffic-light minimum distance to stop line when stopping (m)");
+DEFINE_double(traffic_light_stop_distance_max, 2.0,
+              "Traffic-light maximum distance to stop line when stopping (m)");
+DEFINE_int32(scenario_time_limit_sec, 90, "Scenario time limit (seconds)");
 
 // Construction zone flag definitions
-DEFINE_double(construction_area_speed_limit, 8.333333, "施工区域限速(m/s), 默认 30 km/h");
-DEFINE_string(construction_obstacle_id_prefix, "CONSTRUCTION_", "施工区虚拟障碍物 ID 前缀");
-DEFINE_double(construction_penalty_per_frame_per_mps, 2.0, "施工区内每帧每超速1m/s 扣分");
+DEFINE_double(construction_area_speed_limit, 8.333333,
+              "Construction area speed limit (m/s), default 30 km/h");
+DEFINE_string(construction_obstacle_id_prefix, "CONSTRUCTION_",
+              "Construction zone virtual obstacle id prefix");
+DEFINE_double(construction_penalty_per_frame_per_mps, 2.0,
+              "Construction zone overspeed penalty per frame per m/s");
 
 // Autonomous parking flag definitions
-DEFINE_double(parking_search_radius_m, 40.0, "停车场入口周围搜索停车位半径(m)");
-DEFINE_int32(parking_search_timeout_sec, 85, "自主泊车总超时时间(秒)，比赛要求90秒");
-DEFINE_double(parking_line_tolerance_m, 0.1, "停车压线容忍距离(m)，超出扣20分");
-DEFINE_string(parking_entrance_id, "", "停车场入口ID，用于最近停车位搜索");
+DEFINE_double(parking_search_radius_m, 40.0,
+              "Radius for searching parking spots near entrance (m)");
+DEFINE_int32(parking_search_timeout_sec, 90,
+             "Autonomous parking timeout in seconds");
+DEFINE_double(parking_line_tolerance_m, 0.1,
+              "Tolerance for parking line violation detection (m)");
+DEFINE_string(parking_entrance_id, "",
+              "Parking entrance id for nearest spot search");
+

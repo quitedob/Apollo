@@ -2,6 +2,7 @@ parking_spot_range_to_start: 20.0
 max_valid_stop_distance: 1.0
 
 # Competition parking parameters
-parking_search_radius: 40.0   # 入口周围搜索停车位半径(m)
-parking_search_timeout_sec: 85.0  # 泊车阶段超时时间(秒)，比赛要求90秒
-parking_line_tolerance: 0.1   # 停车压线容忍距离(m)，超出扣20分
+parking_search_radius: 40.0
+parking_search_timeout_sec: 90.0
+parking_line_tolerance: 0.1
+

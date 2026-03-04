@@ -20,6 +20,7 @@
 
 #include "modules/planning/traffic_rules/traffic_light/traffic_light.h"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -32,6 +33,7 @@
 #include "modules/planning/planning_base/common/planning_context.h"
 #include "modules/planning/planning_base/common/util/common.h"
 #include "modules/planning/planning_base/common/util/util.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -152,17 +154,32 @@ void TrafficLight::MakeDecisions(Frame* const frame,
       continue;
     }
 
+    double min_stop_distance = FLAGS_traffic_light_stop_distance_min;
+    double max_stop_distance = FLAGS_traffic_light_stop_distance_max;
+    if (min_stop_distance > max_stop_distance) {
+      std::swap(min_stop_distance, max_stop_distance);
+    }
+    const double effective_stop_distance = std::min(
+        max_stop_distance,
+        std::max(min_stop_distance, config_.stop_distance()));
+    if (effective_stop_distance != config_.stop_distance()) {
+      AWARN << "Traffic-light stop_distance " << config_.stop_distance()
+            << "m is out of configured range [" << min_stop_distance << ", "
+            << max_stop_distance << "]m. Using clamped value "
+            << effective_stop_distance << "m.";
+    }
+
     // build stop decision
     ADEBUG << "BuildStopDecision: traffic_light["
            << traffic_light_overlap.object_id << "] start_s["
            << traffic_light_overlap.start_s << "]"
-           << "stop_distance: " << config_.stop_distance();
+           << "stop_distance: " << effective_stop_distance;
     std::string virtual_obstacle_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const std::vector<std::string> wait_for_obstacles;
     util::BuildStopDecision(
         virtual_obstacle_id, traffic_light_overlap.start_s,
-        config_.stop_distance(), StopReasonCode::STOP_REASON_SIGNAL,
+        effective_stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
         wait_for_obstacles, Getname(), frame, reference_line_info);
   }
 }

@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 
-#include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/planning/scenarios/valet_parking/proto/valet_parking.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -56,16 +55,10 @@ class ValetParkingScenario : public Scenario {
   bool IsTransferable(const Scenario* const other_scenario,
                       const Frame& frame) override;
 
-  // Competition parking spot selection
-  bool SelectNearestParkingSpotNearEntrance(const std::string& entrance_id,
-                                           double search_radius_m,
-                                           std::string* out_parking_spot_id);
-
-  // Helper functions for parking competition
-  bool GetEntrancePointById(const std::string& entrance_id,
-                           apollo::common::PointENU* entrance_point);
-  bool IsParkingSpotOccupied(const std::string& spot_id);
-  bool IsPointInNoParkingRegion(const apollo::common::PointENU& point);
+  bool SelectNearestParkingSpotNearEntrance(
+      const hdmap::Path& nearby_path, const common::VehicleState& vehicle_state,
+      const std::string& entrance_id, double search_radius_m,
+      std::string* out_parking_spot_id) const;
 
  private:
   static bool SearchTargetParkingSpotOnPath(

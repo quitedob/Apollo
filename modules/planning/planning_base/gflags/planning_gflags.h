@@ -312,8 +312,10 @@ DECLARE_double(max_driving_speed);              // Maximum driving speed (m/s), 
 DECLARE_double(max_long_acc);                   // Maximum longitudinal acceleration (m/s^2), competition limit 3.0
 DECLARE_double(max_long_dec);                   // Maximum longitudinal deceleration (positive value, m/s^2), competition limit 6.0
 DECLARE_double(max_lateral_acc);                // Maximum lateral (centripetal) acceleration (m/s^2), competition limit 2.0
-DECLARE_double(stop_tolerance_min);             // Minimum tolerance distance from stop to stop line (m), competition 2.0
-DECLARE_double(stop_tolerance_max);             // Maximum tolerance distance from stop to stop line (m), competition 2.5
+DECLARE_double(stop_tolerance_min);             // Stop-sign minimum distance to stop line (m)
+DECLARE_double(stop_tolerance_max);             // Stop-sign maximum distance to stop line (m)
+DECLARE_double(traffic_light_stop_distance_min);  // Traffic-light minimum stop distance to stop line (m)
+DECLARE_double(traffic_light_stop_distance_max);  // Traffic-light maximum stop distance to stop line (m)
 DECLARE_int32(scenario_time_limit_sec);         // Scenario time limit (seconds), competition 90
 
 // Construction zone flags

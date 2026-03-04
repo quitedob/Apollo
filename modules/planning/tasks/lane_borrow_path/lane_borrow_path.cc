@@ -234,8 +234,8 @@ bool LaneBorrowPath::AssessPath(std::vector<PathData>* candidate_path_data,
     *final_path = valid_path_data[0];
   }
 
-  // 竞赛要求：侧向绕障时速度上限为5.0 m/s
-  // 对最终选择的车道借道路径进行速度限制
+  // Competition rule: side-pass speed should be capped at 5.0 m/s.
+  // Mark selected lane-borrow path for side-pass speed limiting.
   LimitSidePassSpeed(final_path);
 
   RecordDebugInfo(*final_path, final_path->path_label(), reference_line_info_);
@@ -790,34 +790,25 @@ int GetBackToInLaneIndex(
 }
 
 void LaneBorrowPath::LimitSidePassSpeed(PathData* const path_data) {
-  // 竞赛要求：侧向绕障时速度上限为5.0 m/s
   const double kMaxSidePassSpeed = 5.0;  // m/s
 
-  if (path_data == nullptr || path_data->Empty()) {
+  if (path_data == nullptr || path_data->Empty() ||
+      path_data->discretized_path().empty()) {
     return;
   }
 
-  // 获取路径中的所有轨迹点
-  const auto& path_points = path_data->discretized_path();
-  if (path_points.empty()) {
-    return;
+  auto label = path_data->path_label();
+  if (label.find("SIDE_PASS_SPEED_LIMITED") == std::string::npos) {
+    if (!label.empty()) {
+      label += "_";
+    }
+    label += "SIDE_PASS_SPEED_LIMITED";
+    path_data->set_path_label(label);
   }
 
-  // 遍历路径点，对超出速度上限的点进行限速
-  for (const auto& path_point : path_points) {
-    (void)path_point;
-    // 注意：这里只是限制路径规划的速度，实际的速度规划会在后续的速度优化模块中进行
-    // 这里我们标记该路径段需要速度限制，在后续处理中会考虑这个约束
+  ADEBUG << "Lane borrow path speed limited to " << kMaxSidePassSpeed
+         << " m/s for side-pass maneuver";
 
-    // 记录侧向绕障速度限制信息，用于调试和监控
-    ADEBUG << "Lane borrow path speed limited to " << kMaxSidePassSpeed
-           << " m/s for side-pass maneuver";
-  }
-
-  // 设置路径标签，表明这是受速度限制的侧向绕障路径
-  path_data->set_path_label("SIDE_PASS_SPEED_LIMITED");
-
-  // 在规划上下文中记录侧向绕障速度限制状态
   auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();

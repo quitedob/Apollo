@@ -1,2 +1,3 @@
 enabled: true
-stop_distance: 1.75
+stop_distance: 2.25
+

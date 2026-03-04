@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_interface_base/scenario_base/stage.h"
@@ -37,11 +38,7 @@ class StageParking : public Stage {
  private:
   StageResult FinishStage();
 
-  // Competition parking checks
   bool CheckParkingLineViolation(Frame* frame, const std::string& parking_spot_id);
-  bool IsPointInNoParkingRegion(const apollo::common::PointENU& point);
-
-  ScenarioValetParkingConfig scenario_config_;
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::StageParking, Stage)
