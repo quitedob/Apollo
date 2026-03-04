@@ -1,0 +1,13 @@
+{
+  "params": {
+    "time_limit_sec": 90.0,
+    "line_violation_penalty": 20
+  },
+  "log_data": {
+    "scenario_duration": 68.5,
+    "scenario_success": true,
+    "forbidden_zone_entries": [],
+    "parking_line_violation": false
+  }
+}
+

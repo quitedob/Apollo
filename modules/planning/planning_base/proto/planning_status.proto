@@ -85,6 +85,10 @@ message PathDeciderStatus {
   optional bool left_borrow = 4 [default = false];
   // If vehicle right borrow
   optional bool right_borrow = 5 [default = false];
+  // If current lane borrow path needs side-pass speed limit.
+  optional bool is_side_pass_speed_limited = 6 [default = false];
+  // Max speed used during side-pass maneuver.
+  optional double side_pass_max_speed = 7 [default = 5.0];
 }
 
 message PullOverStatus {

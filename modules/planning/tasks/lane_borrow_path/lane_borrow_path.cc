@@ -798,10 +798,14 @@ void LaneBorrowPath::LimitSidePassSpeed(PathData* const path_data) {
   }
 
   // 获取路径中的所有轨迹点
-  auto& path_points = path_data->mutable_discretized_path();
+  const auto& path_points = path_data->discretized_path();
+  if (path_points.empty()) {
+    return;
+  }
 
   // 遍历路径点，对超出速度上限的点进行限速
-  for (auto& path_point : *path_points) {
+  for (const auto& path_point : path_points) {
+    (void)path_point;
     // 注意：这里只是限制路径规划的速度，实际的速度规划会在后续的速度优化模块中进行
     // 这里我们标记该路径段需要速度限制，在后续处理中会考虑这个约束
 

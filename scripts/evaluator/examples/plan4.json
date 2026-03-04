@@ -1,0 +1,15 @@
+{
+  "params": {
+    "speed_limit": 8.333,
+    "penalty_per_frame_per_mps": 2.0
+  },
+  "trajectory": [
+    {"timestamp": 0.0, "x": 0.0, "y": 0.0, "v": 5.0},
+    {"timestamp": 0.1, "x": 2.0, "y": 0.0, "v": 6.0},
+    {"timestamp": 0.2, "x": 4.0, "y": 0.0, "v": 6.5}
+  ],
+  "construction_zones": [
+    {"type": "box", "xmin": 50.0, "xmax": 60.0, "ymin": -5.0, "ymax": 5.0}
+  ]
+}
+

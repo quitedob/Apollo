@@ -1,0 +1,17 @@
+{
+  "scenario_duration": 76.4,
+  "collision": false,
+  "yield_failure": false,
+  "trajectory": [
+    {"t": 0.0, "v": 0.0, "ax": 0.0, "ay": 0.0},
+    {"t": 0.1, "v": 3.2, "ax": 2.0, "ay": 0.3},
+    {"t": 0.2, "v": 2.5, "ax": -2.0, "ay": 0.2}
+  ],
+  "stop_rule": {
+    "required": true,
+    "stopped": true,
+    "stop_line_s": 120.0,
+    "stop_pose_s": 117.8
+  }
+}
+

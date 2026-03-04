@@ -1,0 +1,20 @@
+{
+  "trajectory": [
+    {"t": 0.0, "v": 0.0, "ax": 0.0, "ay": 0.0},
+    {"t": 0.1, "v": 3.0, "ax": 2.0, "ay": 0.4},
+    {"t": 0.2, "v": 4.0, "ax": 1.0, "ay": 0.5},
+    {"t": 0.3, "v": 0.0, "ax": -2.5, "ay": 0.2}
+  ],
+  "red_light": {
+    "required": true,
+    "stopped": true,
+    "stop_line_s": 100.0,
+    "stop_pose_s": 98.3,
+    "right_turn_required": false,
+    "did_right_turn_on_red": false
+  },
+  "side_pass_segments": [
+    {"min_lateral_distance": 1.2, "max_speed": 4.5}
+  ]
+}
+
